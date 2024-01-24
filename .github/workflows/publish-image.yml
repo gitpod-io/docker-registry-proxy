@@ -1,4 +1,4 @@
-name: Release local-runner for Mac
+name: Release container image
 
 permissions:
   contents: read
