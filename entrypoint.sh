@@ -46,7 +46,7 @@ ALLDOMAINS=""
 echo -n "" > /etc/nginx/docker.intercept.map
 
 # Some hosts/registries are always needed, but others can be configured in env var REGISTRIES
-for ONEREGISTRYIN in docker.caching.proxy.internal registry-1.docker.io auth.docker.io ${REGISTRIES}; do
+for ONEREGISTRYIN in gitpod.local docker.caching.proxy.internal registry-1.docker.io auth.docker.io ${REGISTRIES}; do
     ONEREGISTRY=$(echo ${ONEREGISTRYIN} | xargs) # Remove whitespace
     echo "Adding certificate for registry: $ONEREGISTRY"
     ALLDOMAINS="${ALLDOMAINS},DNS:${ONEREGISTRY}"
@@ -105,7 +105,7 @@ CACHE_DIRECTORY=${CACHE_DIRECTORY:-/docker_mirror_cache}
 
 # The cache directory. This can get huge. Better to use a Docker volume pointing here!
 # Set to 32gb which should be enough
-echo "proxy_cache_path ${CACHE_DIRECTORY} levels=1:2 max_size=${CACHE_MAX_SIZE:-15g} min_free=${CACHE_MIN_FREE:-1g} inactive=${CACHE_INACTIVE_TIME:-60d} keys_zone=cache:${CACHE_KEYS_ZONE:-15m} use_temp_path=off manager_threshold=${CACHE_MANAGER_THRESHOLD:-1000ms} manager_sleep=${CACHE_MANAGER_SLEEP:-250ms} manager_files=${CACHE_MANAGER_FILES:-100} loader_files=${CACHE_LOADER_FILES:-100} loader_threshold=${CACHE_LOADER_THRESHOLD:-200ms} loader_sleep=${CACHE_LOADER_SLEEP:-50ms};" > /etc/nginx/conf.d/cache_max_size.conf
+echo "proxy_cache_path ${CACHE_DIRECTORY} levels=1:2 max_size=${CACHE_MAX_SIZE} min_free=${CACHE_MIN_FREE:-1g} inactive=${CACHE_INACTIVE_TIME:-60d} keys_zone=cache:${CACHE_KEYS_ZONE:-15m} use_temp_path=off manager_threshold=${CACHE_MANAGER_THRESHOLD:-1000ms} manager_sleep=${CACHE_MANAGER_SLEEP:-250ms} manager_files=${CACHE_MANAGER_FILES:-100} loader_files=${CACHE_LOADER_FILES:-100} loader_threshold=${CACHE_LOADER_THRESHOLD:-200ms} loader_sleep=${CACHE_LOADER_SLEEP:-50ms};" > /etc/nginx/conf.d/cache_max_size.conf
 
 if [[ "a${SLOW_TIER_ENABLED}" == "atrue" ]]; then
     {

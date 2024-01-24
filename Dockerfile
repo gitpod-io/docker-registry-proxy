@@ -1,13 +1,11 @@
-# We start from my nginx fork which includes the proxy-connect module from tEngine
-# Source is available at https://github.com/rpardini/nginx-proxy-connect-stable-alpine
-# This is already multi-arch!
-ARG BASE_IMAGE="docker.io/rpardini/nginx-proxy-connect-stable-alpine:nginx-1.20.1-alpine-3.12.7"
+# Update image once
+ARG BASE_IMAGE=ghcr.io/gitpod-io/nginx-with-proxy-connect:sha-2331b78
 # Could be "-debug"
 ARG BASE_IMAGE_SUFFIX="${IMAGE_SUFFIX}"
 FROM ${BASE_IMAGE}${BASE_IMAGE_SUFFIX}
 
 # Link image to original repository on GitHub
-LABEL org.opencontainers.image.source https://github.com/rpardini/docker-registry-proxy
+LABEL org.opencontainers.image.source https://github.com/gitpod-io/docker-registry-proxy
 
 # apk packages that will be present in the final image both debug and release
 RUN apk add --no-cache --update bash ca-certificates-bundle coreutils openssl
@@ -78,7 +76,7 @@ ENV DEBUG_NGINX="false"
 # Enable slow caching tier; this allows caching in a secondary cache path on e.g a larger slower disk; for known URIs defined in SLOW_TIER_URIS
 ENV SLOW_TIER_ENABLED="false"
 # Statically define worker_processes; defaults to auto
-ENV WORKER_PROCESSES="auto"
+ENV WORKER_PROCESSES="2"
 
 # Manifest caching tiers. Disabled by default, to mimick 0.4/0.5 behaviour.
 # Setting it to true enables the processing of the ENVs below.
