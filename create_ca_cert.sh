@@ -62,7 +62,7 @@ fi
 
 cd /certs
 
-if [ -f "fullchain_with_key.pem" ]; then
+if [ ! -f "fullchain_with_key.pem" ]; then
     logInfo "Generate IA key"
     openssl genrsa -des3 -passout pass:foobar -out ia.key 4096 &>/dev/null
 
