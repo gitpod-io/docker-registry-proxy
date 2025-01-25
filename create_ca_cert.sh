@@ -7,7 +7,7 @@ CERT_PASSWORD=${CERT_PASSWORD:-foobar} # Allow override via environment
 KEY_SIZE_CA=${KEY_SIZE_CA:-4096}
 KEY_SIZE_WEB=${KEY_SIZE_WEB:-2048}
 ENCRYPTION_CIPHER="des3"
-ALLDOMAINS=${ALLDOMAINS:-""}
+ALLDOMAINS=${ALLDOMAINS:-"gitpod.local"}
 
 # Cleanup function
 cleanup() {
@@ -135,10 +135,10 @@ openssl genrsa -des3 -passout pass:foobar -out web.orig.key 2048 &>/dev/null
 openssl rsa -passin pass:foobar -in web.orig.key -out web.key &>/dev/null
 
 logInfo "Create the signing request, using extensions"
-openssl req -new -key web.key -sha256 -out web.csr -passin pass:foobar -subj "/C=DE/ST=Schleswig-Holstein/L=Kiel/O=Gitpod GmbH/OU=IT/CN=${CN_WEB}" -reqexts SAN -config <(cat <(printf "[req]\ndistinguished_name = dn\n[dn]\n[SAN]\nsubjectAltName=%s" "$ALLDOMAINS"))
+openssl req -new -key web.key -sha256 -out web.csr -passin pass:foobar -subj "/C=DE/ST=Schleswig-Holstein/L=Kiel/O=Gitpod GmbH/OU=IT/CN=${CN_WEB}" -reqexts SAN -config <(cat <(printf "[req]\ndistinguished_name = dn\n[dn]\n[SAN]\nsubjectAltName=DNS:%s" "$ALLDOMAINS"))
 
 logInfo "Sign the request, using the intermediate cert and key"
-openssl x509 -req -days 36500 -in web.csr -CA ia.crt -CAkey ia.key -out web.crt -passin pass:foobar -extensions SAN -extfile <(cat <(printf '[req]\ndistinguished_name = dn\n[dn]\n[SAN]\nsubjectAltName=%s' "$ALLDOMAINS")) &>/dev/null
+openssl x509 -req -days 36500 -in web.csr -CA ia.crt -CAkey ia.key -out web.crt -passin pass:foobar -extensions SAN -extfile <(cat <(printf '[req]\ndistinguished_name = dn\n[dn]\n[SAN]\nsubjectAltName=DNS:%s' "$ALLDOMAINS")) &>/dev/null
 
 logInfo "Concatenating fullchain.pem..."
 cat web.crt ia.crt "${CA_CRT_FILE}" >fullchain.pem
